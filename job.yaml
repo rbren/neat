@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: neat-worker
+  namespace: neat-workers
+spec:
+  ttlSecondsAfterFinished: 100
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: neat-worker
+        image: quay.io/robertbrennan/neat:latest
+        imagePullPolicy: Always
+        command:
+        - python
+        - /neat/lib/train.py

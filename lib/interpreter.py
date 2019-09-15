@@ -81,7 +81,6 @@ def build_model(genome):
             output_nodes.append(node)
         else:
             nodes.append(node)
-    print("OUT", output_nodes)
     y = tf.concat(output_nodes, 1)
     return x, y, y_
 

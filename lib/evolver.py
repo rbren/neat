@@ -1,9 +1,9 @@
 from interpreter import read_genome, get_ordered_keys
 from random import random, randint
 
-ADD_NODE = .2
+ADD_NODE = .5
 DELETE_CONN = .2
-ADD_CONN = .2
+ADD_CONN = .5
 
 def evolve(genome):
     did_something = False

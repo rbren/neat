@@ -2,23 +2,23 @@ import tensorflow as tf
 
 from evolver import evolve
 from interpreter import build_model, read_genome
-from data import feed_dict
+from data.mnist import feed_dict
 
-STEPS_PER_GENERATION = 2500
+STEPS_PER_GENERATION = 1000
 
 def train(genome):
     sess = tf.compat.v1.InteractiveSession()
     x, y, y_ = build_model(genome)
     tf.compat.v1.global_variables_initializer().run()
 
-    with tf.compat.v1.name_scope('absolute_difference'):
+    with tf.compat.v1.name_scope('loss_function'):
         with tf.compat.v1.name_scope('total'):
-            absolute_difference = tf.compat.v1.losses.absolute_difference(
-                    labels=y_, predictions=y)
-    tf.compat.v1.summary.scalar('absolute_difference', absolute_difference)
+            loss_function = tf.reduce_mean(
+                    tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y))
+    tf.compat.v1.summary.scalar('loss_function', loss_function)
 
     with tf.compat.v1.name_scope('train'):
-        train_step = tf.compat.v1.train.AdamOptimizer(0.001).minimize(absolute_difference)
+        train_step = tf.compat.v1.train.AdamOptimizer(0.001).minimize(loss_function)
 
     merged = tf.compat.v1.summary.merge_all()
     train_writer = tf.compat.v1.summary.FileWriter('log/train',
@@ -27,8 +27,8 @@ def train(genome):
     tf.compat.v1.global_variables_initializer().run()
 
     for i in range(STEPS_PER_GENERATION):
-        if i % int(STEPS_PER_GENERATION / 5) == 0:    # Record summaries and test-set absolute_difference
-            summary, loss = sess.run([merged, absolute_difference], feed_dict=feed_dict(x, y_, False))
+        if i % int(STEPS_PER_GENERATION / 5) == 0:    # Record summaries and test-set loss_function
+            summary, loss = sess.run([merged, loss_function], feed_dict=feed_dict(x, y_, False))
             test_writer.add_summary(summary, i)
             print('Loss at step %s: %s' % (i, loss))
         else:    # Record train set summaries, and train

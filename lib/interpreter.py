@@ -16,18 +16,38 @@ def variable_summaries(var):
 def read_genome(fname):
     genome = {'connections': {}}
     with open(fname) as f:
-        for line in f.readlines():
-            nums = re.findall(r'-?\d+', line)
-            nums = [int(n) for n in nums]
-            if line.startswith("INPUT"):
-                genome['input'] = nums[0]
-            elif line.startswith("OUTPUT"):
-                genome['output'] = nums[0]
-            else:
-                if nums[1] not in genome['connections']:
-                    genome['connections'][nums[1]] = []
-                genome['connections'][nums[1]].append(nums[0])
+        return deserialize_genome(f.read())
+
+def write_genome(genome, fname):
+    with open(fname, 'w') as f:
+        f.write(serialize_genome(genome))
+
+def deserialize_genome(serialized):
+    genome = {'connections': {}}
+    lines = serialized.split('\n')
+    for line in lines:
+        if line == "": continue
+        nums = re.findall(r'-?\d+', line)
+        nums = [int(n) for n in nums]
+        if line.startswith("INPUT"):
+            genome['input'] = nums[0]
+        elif line.startswith("OUTPUT"):
+            genome['output'] = nums[0]
+        else:
+            print(line, nums)
+            if nums[1] not in genome['connections']:
+                genome['connections'][nums[1]] = []
+            genome['connections'][nums[1]].append(nums[0])
     return genome
+
+def serialize_genome(genome):
+    out = 'INPUT(%d)\n' % genome['input']
+    conn_keys = get_ordered_keys(genome)
+    for key in conn_keys:
+        for inp in genome['connections'][key]:
+            out += "%d->%d\n" % (inp, key)
+    out += 'OUTPUT(%d)' % genome['output']
+    return out
 
 def get_ordered_keys(genome):
     conn_keys = genome['connections'].keys()
@@ -61,6 +81,11 @@ def build_model(genome):
             output_nodes.append(node)
         else:
             nodes.append(node)
+    print("OUT", output_nodes)
     y = tf.concat(output_nodes, 1)
     return x, y, y_
+
+if __name__ == "__main__":
+    g = read_genome('genome.txt')
+    write_genome(g, 'genome2.txt')
 

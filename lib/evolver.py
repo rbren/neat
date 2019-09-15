@@ -9,7 +9,7 @@ def evolve(genome):
     did_something = False
     new_genome = {'input': genome['input'], 'output': genome['output'], 'connections': {}}
     node_names = [-1 - r for r in range(genome['output'])]
-    node_names = node_names + range(genome['input']) + genome['connections'].keys()
+    node_names = node_names + list(range(genome['input'])) + list(genome['connections'].keys())
     node_names = list(set(node_names))
     node_names.sort()
     next_node_name = node_names[-1] + 1

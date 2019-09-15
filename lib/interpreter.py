@@ -50,7 +50,7 @@ def serialize_genome(genome):
     return out
 
 def get_ordered_keys(genome):
-    conn_keys = genome['connections'].keys()
+    conn_keys = list(genome['connections'].keys())
     conn_keys.sort()
     conn_keys = [k for k in conn_keys if k >= 0] + [k for k in conn_keys if k < 0]
     return conn_keys

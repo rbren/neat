@@ -4,7 +4,7 @@ from evolver import evolve
 from interpreter import build_model, read_genome
 from data.mnist import feed_dict
 
-STEPS_PER_GENERATION = 1000
+STEPS_PER_GENERATION = 2500
 
 def train(genome):
     sess = tf.compat.v1.InteractiveSession()
@@ -53,15 +53,5 @@ def train(genome):
 
 if __name__ == '__main__':
     genome = read_genome('genome.txt')
-    loss = 1000
-
-    for i in range(100):
-        new_genome = evolve(genome)
-        print(genome)
-        print(new_genome)
-        new_loss = train(new_genome)
-        print("loss", loss, new_loss)
-        if new_loss < loss:
-            print("IMPROVE!")
-            genome = new_genome
-            loss = new_loss
+    loss = train(genome)
+    print("FINAL LOSS: %f" % loss)
